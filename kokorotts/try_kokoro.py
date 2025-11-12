@@ -4,27 +4,29 @@ import soundfile as sf
 import os
 import numpy as np
 
-output_audio_name = "advancement of TTS recently"
-
+output_audio_name = "interesting shark fact"
 audio_folder = "audios/"
 os.makedirs(audio_folder, exist_ok=True)
 
 pipeline = KPipeline(lang_code='a')
 
 text = '''
-Text-to-Speech technology has come a long way in recent years! Modern TTS systems can now produce voices that sound natural, expressive, and even emotional.
-Once you start experimenting with them, you’ll see how every model has its own unique tone and rhythm — and that makes it easier not only to create lifelike speech,
-but also to explore the exciting connection between language, sound, and human expression.
+Sharks have been swimming in the oceans for over 400 million years! That is even before trees grew on land. Some sharks can smell blood from miles away, and the biggest shark, the whale shark, can grow longer than a bus. Sharks are amazing hunters, but they help keep the oceans healthy by eating sick fish.
 '''
 
+# === Track temporary segment paths ===
+temp_files = []
 all_audios = []
 
+# am_echo, am_puck, 
 generator = pipeline(text, voice='am_puck')
 for i, (gs, ps, audio) in enumerate(generator):
     print(i, gs, ps)
     display(Audio(data=audio, rate=24000, autoplay=i==0))
-    segment_path = os.path.join(audio_folder, f"{i}.wav")
+    
+    segment_path = os.path.join(audio_folder, f"temp_{i}.wav")
     sf.write(segment_path, audio, 24000)
+    temp_files.append(segment_path)
     all_audios.append(audio)
 
 # === Combine all audio clips ===
@@ -35,10 +37,9 @@ if all_audios:
     print(f"✅ Combined audio saved to: {combined_path}")
     display(Audio(data=combined, rate=24000, autoplay=True))
 
-    # === Delete individual temporary segment files ===
-    for file in os.listdir(audio_folder):
-        if file.endswith(".wav") and file != f"{output_audio_name}.wav":
-            os.remove(os.path.join(audio_folder, file))
-    print("🧹 Deleted individual segment files.")
+    # === Delete only the temporary files created in this run ===
+    for file_path in temp_files:
+        os.remove(file_path)
+    print("🧹 Deleted temporary segment files.")
 else:
     print("⚠️ No audio segments were generated.")
