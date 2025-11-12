@@ -1,0 +1,6 @@
+**/venv/
+**/*.env
+**/*.wav
+**/*.mp3
+
+!js_mastery_voice.mp3
